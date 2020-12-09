@@ -1,8 +1,6 @@
 const fsPromises = require('fs').promises;
 
-const readFiles = (path) =>{
-  return fsPromises.readFile(path, { encoding: 'utf-8' })
+const readFiles = (path) => fsPromises.readFile(path, { encoding: 'utf-8' })
   .then((data) => JSON.parse(data))
-  .catch((err) => {throw err;});
-};
+  .catch((err) => { throw err; });
 module.exports = readFiles;
