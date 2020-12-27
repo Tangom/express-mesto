@@ -1,13 +1,79 @@
-const path = require('path');
+const Card = require('../models/card');
 
-const readFile = require('../helpers/readFiles');
+const getCards = (req, res) => {
+  Card.find({})
+    .then((data) => res.status(200).send(data))
+    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+};
 
-const pathToCards = path.join(__dirname, '..', 'data', 'cards.json');
+const createCard = (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
+    .then((card) => res.status(200).send(card))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы неверные данные' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
 
-function getCards(req, res) {
-  return readFile(pathToCards)
-    .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({ status: 500, message: err.message }));
-}
+const deleteCard = (req, res) => {
+  const id = req.params.cardId;
+  Card.findByIdAndRemove(id)
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Нет карточки с таким id' });
+      }
+      res.status(200).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы неверные данные' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
 
-module.exports = getCards;
+const likeCard = (req, res) => {
+  const userId = req.user._id;
+  const id = req.params.cardId;
+  Card.findByIdAndRemove(id, { $addToSet: { likes: userId } },
+    { new: true })
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Нет данных' });
+      }
+      res.status(200).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы неверные данные' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
+
+const dislikeCard = (req, res) => {
+  const userId = req.user._id;
+  const id = req.params.cardId;
+  Card.findByIdAndRemove(id, { $addToSet: { likes: userId } },
+    { new: true })
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Нет данных' });
+      }
+      res.status(200).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы неверные данные' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
+
+module.exports = {
+  getCards, createCard, deleteCard, likeCard, dislikeCard,
+};
