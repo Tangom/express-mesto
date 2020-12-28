@@ -8,7 +8,6 @@ const getUsers = (req, res) => {
 
 const getUsersId = (req, res) => {
   User.findById(req.params.id)
-    .then((users) => users.find((user) => user._id === req.params.id))
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
