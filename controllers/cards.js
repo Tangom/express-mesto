@@ -58,7 +58,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   const userId = req.user._id;
   const id = req.params.cardId;
-  Card.findByIdAndUpdate(id, { $addToSet: { likes: userId } },
+  Card.findByIdAndUpdate(id, { $pull: { likes: userId } },
     { new: true })
     .then((card) => {
       if (!card) {
